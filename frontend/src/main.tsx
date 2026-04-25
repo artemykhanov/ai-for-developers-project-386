@@ -7,13 +7,29 @@ import 'dayjs/locale/ru';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { createTheme, MantineProvider } from '@mantine/core';
+import { createTheme, MantineProvider, type MantineColorsTuple } from '@mantine/core';
 import { DatesProvider } from '@mantine/dates';
 import { Notifications } from '@mantine/notifications';
 import App from './App';
 
+const calendarColor: MantineColorsTuple = [
+  '#f0efff',
+  '#dfddf4',
+  '#bcb8e3',
+  '#9791d2',
+  '#7971c4',
+  '#665ebc',
+  '#5c54b8',
+  '#4c459f',
+  '#433d8f',
+  '#37327f',
+];
+
 const theme = createTheme({
-  primaryColor: 'indigo',
+  colors: {
+    calendar: calendarColor,
+  },
+  primaryColor: 'calendar',
   defaultRadius: 'md',
   fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
 });

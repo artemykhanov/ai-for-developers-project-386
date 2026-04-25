@@ -1,8 +1,8 @@
-import { Button, Card, Group, Modal, SimpleGrid, Stack, Stepper, Text, Title } from '@mantine/core';
+import { Badge, Button, Card, Group, Modal, SimpleGrid, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useEffect, useState } from 'react';
 import { api } from '../api/client';
-import { ApiError, type EventType, type Slot } from '../api/types';
+import { ApiError, type CalendarOwner, type EventType, type Slot } from '../api/types';
 import BookingForm from '../components/BookingForm';
 import EventTypeCard from '../components/EventTypeCard';
 import SlotPicker from '../components/SlotPicker';
@@ -10,6 +10,7 @@ import { EmptyState, ErrorState, LoadingState } from '../components/StatusViews'
 
 export default function PublicBookingPage() {
   const [eventTypes, setEventTypes] = useState<EventType[]>([]);
+  const [owner, setOwner] = useState<CalendarOwner>();
   const [selectedEventType, setSelectedEventType] = useState<EventType>();
   const [slots, setSlots] = useState<Slot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<Slot>();
@@ -25,7 +26,20 @@ export default function PublicBookingPage() {
     setLoadingEventTypes(true);
     setError(undefined);
     try {
-      setEventTypes(await api.listEventTypes());
+      const [eventTypesResult, ownerResult] = await Promise.allSettled([
+        api.listEventTypes(),
+        api.getOwner(),
+      ]);
+
+      if (eventTypesResult.status === 'rejected') {
+        throw eventTypesResult.reason;
+      }
+
+      setEventTypes(eventTypesResult.value);
+
+      if (ownerResult.status === 'fulfilled') {
+        setOwner(ownerResult.value);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка загрузки типов событий');
     } finally {
@@ -55,6 +69,8 @@ export default function PublicBookingPage() {
     void loadSlots(eventType);
   };
 
+  const ownerName = owner?.name || 'Владелец календаря';
+
   const handleSubmitBooking = async (values: { guestName: string; guestContact: string }) => {
     if (!selectedEventType || !selectedSlot) {
       return;
@@ -82,18 +98,39 @@ export default function PublicBookingPage() {
 
   return (
     <Stack gap="xl">
-      <Card withBorder className="hero-card">
-        <Stack gap="xs">
-          <Title order={1}>Забронируйте встречу</Title>
-          <Text c="dimmed" maw={760}>Выберите подходящий формат встречи, свободное время и оставьте контактные данные для подтверждения записи.</Text>
+      <section className="booking-hero">
+        <Stack gap="xl" className="hero-copy">
+          <Stack gap="md">
+            <Badge className="hero-kicker" variant="white">Быстрая запись на встречу</Badge>
+            <Title order={1}>CalKing</Title>
+            <Text className="hero-text">Забронируйте встречу за минуту: выберите тип события, удобный слот и оставьте контакты для подтверждения.</Text>
+          </Stack>
+          <Group gap="sm">
+            <Button size="md" className="hero-action" onClick={() => document.getElementById('event-types')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>Записаться</Button>
+            <Text size="sm" c="dimmed">3 шага до подтверждения</Text>
+          </Group>
         </Stack>
-      </Card>
 
-      <Stepper active={activeStep} allowNextStepsSelect={false} size="sm">
-        <Stepper.Step label="Тип события" />
-        <Stepper.Step label="Свободный слот" />
-        <Stepper.Step label="Данные гостя" />
-      </Stepper>
+        <Card withBorder className="hero-feature-card">
+          <Stack gap="md">
+            <Title order={2}>Возможности</Title>
+            <Stack gap="sm" className="feature-list">
+              <Text>Выбор типа события и удобного времени для встречи.</Text>
+              <Text>Быстрое бронирование с подтверждением и контактами гостя.</Text>
+              <Text>Управление типами встреч и просмотр предстоящих записей в админке.</Text>
+            </Stack>
+          </Stack>
+        </Card>
+      </section>
+
+      <div className="progress-steps" aria-label="Шаги бронирования">
+        {['Тип события', 'Свободный слот', 'Данные гостя'].map((label, index) => (
+          <div key={label} className={index <= activeStep ? 'progress-step progress-step-active' : 'progress-step'}>
+            <ThemeIcon size="sm" radius="xl" variant={index <= activeStep ? 'filled' : 'light'}>{index + 1}</ThemeIcon>
+            <Text size="sm" fw={700}>{label}</Text>
+          </div>
+        ))}
+      </div>
 
       {loadingEventTypes ? <LoadingState /> : null}
       {error ? <ErrorState message={error} onRetry={loadEventTypes} /> : null}
@@ -103,26 +140,39 @@ export default function PublicBookingPage() {
       ) : null}
 
       {eventTypes.length > 0 ? (
-        <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }}>
-          {eventTypes.map((eventType) => (
-            <EventTypeCard key={eventType.id} eventType={eventType} active={eventType.id === selectedEventType?.id} onSelect={handleSelectEventType} />
-          ))}
-        </SimpleGrid>
+        <Stack gap="lg" id="event-types" className="event-section">
+          <Card withBorder className="event-intro-card">
+            <Group gap="md" align="center" wrap="nowrap">
+              <div className="host-avatar" aria-hidden="true" />
+              <div>
+                <Text fw={800}>{ownerName}</Text>
+                <Text size="sm" c="dimmed">Владелец календаря</Text>
+              </div>
+            </Group>
+            <Stack gap="xs" mt="lg">
+              <Title order={2}>Выберите тип события</Title>
+              <Text c="dimmed">Нажмите на карточку, чтобы открыть календарь и выбрать удобный слот.</Text>
+            </Stack>
+          </Card>
+          <SimpleGrid cols={{ base: 1, sm: 2 }}>
+            {eventTypes.map((eventType) => (
+              <EventTypeCard key={eventType.id} eventType={eventType} active={eventType.id === selectedEventType?.id} onSelect={handleSelectEventType} />
+            ))}
+          </SimpleGrid>
+        </Stack>
       ) : null}
 
       {selectedEventType ? (
-        <Card withBorder>
-          <Stack>
-            <Group justify="space-between" align="flex-start">
-              <div>
-                <Title order={2}>Свободное время</Title>
-                <Text c="dimmed">{selectedEventType.title}, {selectedEventType.durationMinutes} минут</Text>
-              </div>
-              <Button variant="light" onClick={() => void loadSlots(selectedEventType)} loading={loadingSlots}>Обновить</Button>
-            </Group>
-            {loadingSlots ? <LoadingState label="Загружаем слоты" /> : <SlotPicker slots={slots} selectedStartAt={selectedSlot?.startAt} onSelect={(slot) => { setSelectedSlot(slot); setBookingOpened(true); }} />}
-          </Stack>
-        </Card>
+        <section className="slot-section">
+          <Group justify="space-between" align="flex-end" mb="lg">
+            <div>
+              <Title order={2}>{selectedEventType.title}</Title>
+              <Text c="dimmed">Выберите свободное время для бронирования. Занятые слоты показаны, но недоступны для выбора.</Text>
+            </div>
+            <Button variant="light" onClick={() => void loadSlots(selectedEventType)} loading={loadingSlots}>Обновить</Button>
+          </Group>
+          {loadingSlots ? <LoadingState label="Загружаем слоты" /> : <SlotPicker eventType={selectedEventType} ownerName={ownerName} slots={slots} selectedStartAt={selectedSlot?.startAt} onSelect={(slot) => { setSelectedSlot(slot); setBookingOpened(true); }} />}
+        </section>
       ) : null}
 
       <Modal opened={bookingOpened} onClose={() => setBookingOpened(false)} title="Подтвердить бронирование" centered>
