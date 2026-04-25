@@ -1,15 +1,23 @@
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/artemykhanov/ai-for-developers-project-386/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/artemykhanov/ai-for-developers-project-386/actions)
 
-## CalKing Frontend
+## CalKing
 
 Фронтенд находится в отдельной директории `frontend/` и работает только через HTTP API по TypeSpec/OpenAPI контракту.
+Backend находится в отдельной директории `backend/`, реализован на FastAPI и пока хранит данные в памяти процесса.
 
 ### Установка
 
 ```bash
 npm install
 npm --prefix frontend install
+uv sync --project backend
+```
+
+Или через Makefile:
+
+```bash
+make install
 ```
 
 ### Mock API через Prism
@@ -40,6 +48,22 @@ npm run frontend:dev
 http://localhost:3000/api
 ```
 
+### Запуск backend
+
+Backend запускается на `http://localhost:8000`, API доступен под префиксом `/api`:
+
+```bash
+make backend-dev
+```
+
+То же самое без Makefile:
+
+```bash
+uv run --directory backend fastapi dev app/main.py
+```
+
+Данные backend хранятся в памяти и сбрасываются при перезапуске процесса.
+
 ### Запуск с отдельно поднятым backend
 
 Создайте `frontend/.env` или передайте переменную окружения:
@@ -54,10 +78,22 @@ VITE_API_BASE_URL=http://localhost:3000/api npm run frontend:dev
 VITE_API_BASE_URL=http://localhost:8080/api npm run frontend:dev
 ```
 
+Для локального FastAPI backend:
+
+```bash
+VITE_API_BASE_URL=http://localhost:8000/api npm run frontend:dev
+```
+
 ### Проверка сборки
 
 ```bash
 npm run frontend:build
+```
+
+Проверка backend:
+
+```bash
+make backend-check
 ```
 
 ### Реализованные сценарии

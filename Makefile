@@ -1,14 +1,27 @@
-.PHONY: install api-openapi api-mock frontend-dev frontend-build frontend-typecheck
+.PHONY: install api-openapi api-mock backend-install backend-dev backend-run backend-check frontend-dev frontend-build frontend-typecheck
 
 install:
 	npm install
 	npm --prefix frontend install
+	uv sync --project backend
 
 api-openapi:
 	npm run typespec:compile
 
 api-mock:
 	npm run frontend:mock:api
+
+backend-install:
+	uv sync --project backend
+
+backend-dev:
+	uv run --directory backend fastapi dev app/main.py
+
+backend-run:
+	uv run --directory backend fastapi run app/main.py
+
+backend-check:
+	uv run --directory backend python -m compileall app
 
 frontend-dev:
 	npm run frontend:dev
