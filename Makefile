@@ -1,4 +1,4 @@
-.PHONY: install api-openapi api-mock backend-install backend-dev backend-run backend-check frontend-dev frontend-build frontend-typecheck
+.PHONY: install api-openapi api-mock backend-install backend-dev backend-run backend-check frontend-dev frontend-build frontend-typecheck tests-install tests-e2e
 
 install:
 	npm install
@@ -31,3 +31,10 @@ frontend-build:
 
 frontend-typecheck:
 	npm --prefix frontend run typecheck
+
+tests-install:
+	uv sync --project tests
+	uv run --project tests playwright install chromium
+
+tests-e2e:
+	uv run --project tests pytest --browser chromium

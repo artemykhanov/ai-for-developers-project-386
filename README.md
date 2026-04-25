@@ -5,6 +5,7 @@
 
 Фронтенд находится в отдельной директории `frontend/` и работает только через HTTP API по TypeSpec/OpenAPI контракту.
 Backend находится в отдельной директории `backend/`, реализован на FastAPI и пока хранит данные в памяти процесса.
+E2E-тесты находятся в отдельной директории `tests/` и используют Python, pytest и Playwright.
 
 ### Установка
 
@@ -18,6 +19,12 @@ uv sync --project backend
 
 ```bash
 make install
+```
+
+E2E-зависимости и браузер Chromium устанавливаются отдельно:
+
+```bash
+make tests-install
 ```
 
 ### Mock API через Prism
@@ -95,6 +102,16 @@ npm run frontend:build
 ```bash
 make backend-check
 ```
+
+### E2E-тесты
+
+Тесты поднимают FastAPI backend и Vite frontend на свободных локальных портах, затем прогоняют браузерные сценарии через Playwright:
+
+```bash
+make tests-e2e
+```
+
+Сейчас покрыты сценарии публичного бронирования и создания типа события в кабинете владельца. Подробности описаны в `tests/README.md`.
 
 ### Реализованные сценарии
 
