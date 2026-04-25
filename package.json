@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "typespec:compile": "tsp compile api"
+  },
+  "devDependencies": {
+    "@typespec/compiler": "^1.11.0",
+    "@typespec/http": "^1.4.0",
+    "@typespec/openapi3": "^1.4.0",
+    "@typespec/rest": "^0.74.0"
+  }
+}
