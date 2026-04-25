@@ -1,6 +1,9 @@
 {
   "scripts": {
-    "typespec:compile": "tsp compile api"
+    "typespec:compile": "tsp compile api",
+    "frontend:dev": "npm --prefix frontend run dev",
+    "frontend:build": "npm --prefix frontend run build",
+    "frontend:mock:api": "npm run typespec:compile && npm --prefix frontend run mock:api"
   },
   "devDependencies": {
     "@typespec/compiler": "^1.11.0",

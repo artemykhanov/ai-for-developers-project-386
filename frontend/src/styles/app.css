@@ -1,0 +1,38 @@
+:root {
+  color-scheme: light;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(circle at top left, rgba(79, 70, 229, 0.16), transparent 34rem),
+    linear-gradient(180deg, #f7f8ff 0%, #ffffff 42%);
+}
+
+.hero-card {
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(14, 165, 233, 0.06)),
+    var(--mantine-color-white);
+}
+
+.owner-card {
+  background:
+    linear-gradient(135deg, var(--mantine-color-indigo-0), var(--mantine-color-white));
+}
+
+.selected-card {
+  border-color: var(--mantine-primary-color-filled);
+  box-shadow: 0 14px 40px rgba(79, 70, 229, 0.14);
+}
+
+@media (max-width: 48em) {
+  body {
+    background: #ffffff;
+  }
+}
