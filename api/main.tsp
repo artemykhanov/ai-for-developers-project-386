@@ -6,11 +6,11 @@ using TypeSpec.Http;
 using TypeSpec.Rest;
 
 @service(#{
-  title: "Booking API",
+  title: "CalKing API",
 })
 @server("http://localhost:3000", "Local development server")
 @route("/api")
-namespace BookingApi;
+namespace CalKingApi;
 
 /**
  * Единственный заранее заданный владелец календаря. В приложении нет регистрации и входа.

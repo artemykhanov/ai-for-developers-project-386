@@ -15,7 +15,7 @@ export default function App() {
             <Group gap="sm" wrap="nowrap">
               <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
               <Anchor component={Link} to="/" underline="never" c="dark">
-                <Title order={3}>Booking</Title>
+                <Title order={3}>CalKing</Title>
               </Anchor>
               <Badge visibleFrom="xs" variant="light">Онлайн-запись</Badge>
             </Group>
