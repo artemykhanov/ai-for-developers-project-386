@@ -1,0 +1,57 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      UV_PYTHON: '3.14'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Install npm dependencies
+        run: |
+          npm ci
+          npm --prefix frontend ci
+
+      - name: Install backend dependencies
+        run: uv sync --project backend --locked
+
+      - name: Install test dependencies
+        run: uv sync --project tests --locked
+
+      - name: Install Playwright Chromium
+        run: uv run --project tests playwright install --with-deps chromium
+
+      - name: Compile OpenAPI
+        run: make api-openapi
+
+      - name: Check backend
+        run: make backend-check
+
+      - name: Build frontend
+        run: make frontend-build
+
+      - name: Run e2e tests
+        run: make tests-e2e
