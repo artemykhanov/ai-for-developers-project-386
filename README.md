@@ -3,6 +3,8 @@
 
 ## CalKing
 
+Приложение задеплоено на Render: https://calking.onrender.com
+
 Фронтенд находится в отдельной директории `frontend/` и работает только через HTTP API по TypeSpec/OpenAPI контракту.
 Backend находится в отдельной директории `backend/`, реализован на FastAPI и пока хранит данные в памяти процесса.
 E2E-тесты находятся в отдельной директории `tests/` и используют Python, pytest и Playwright.
@@ -52,7 +54,7 @@ npm run frontend:dev
 По умолчанию фронтенд использует API base URL:
 
 ```text
-http://localhost:3000/api
+/api
 ```
 
 ### Запуск backend
